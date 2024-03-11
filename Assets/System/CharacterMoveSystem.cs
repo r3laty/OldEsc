@@ -6,7 +6,7 @@ public class CharacterMoveSystem : ComponentSystem
     private EntityQuery _moveQuery;
     protected override void OnCreate()
     {
-        _moveQuery = GetEntityQuery(ComponentType.ReadOnly<UserInputData>(),
+        _moveQuery = GetEntityQuery(ComponentType.ReadOnly<InputData>(),
             ComponentType.ReadOnly<MoveData>(),
             ComponentType.ReadOnly<Transform>());
     }
