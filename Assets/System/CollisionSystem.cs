@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.VisualScripting.FullSerializer;
@@ -13,16 +14,17 @@ public class CollisionSystem : ComponentSystem
     protected override void OnCreate()
     {
         _collisionQuery = GetEntityQuery(ComponentType.ReadOnly<ActorColliderData>(),
-            ComponentType.ReadOnly <Transform>());
+            ComponentType.ReadOnly<Transform>());
         _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
     }
     protected override void OnUpdate()
     {
-        Entities.With(_collisionQuery).ForEach((Entity entity, CollisionAbility ability, ref ActorColliderData colliderData) =>
+        Entities.With(_collisionQuery).ForEach((Entity entity, CollisionAbility collisionAbility, ref ActorColliderData colliderData) =>
         {
-            var go = ability.gameObject;
+            var go = collisionAbility.gameObject;
             float3 position = go.transform.position;
             Quaternion rotation = go.transform.rotation;
+            collisionAbility.Collisions?.Clear();
 
             int size = 0;
 
@@ -41,13 +43,19 @@ public class CollisionSystem : ComponentSystem
                     break;
 
                 case ColliderType.Box:
-                    size = Physics.OverlapBoxNonAlloc(colliderData.BoxCenter + position, colliderData.BoxHalfExtents, _results, 
-                        colliderData.BoxOrientation * rotation); 
+                    size = Physics.OverlapBoxNonAlloc(colliderData.BoxCenter + position, colliderData.BoxHalfExtents, _results,
+                        colliderData.BoxOrientation * rotation);
                     break;
             }
             if (size > 0)
             {
-                ability.Execute(size);
+                foreach (var result in _results)
+                {
+                    collisionAbility?.Collisions?.Add(result);
+                }
+
+
+                collisionAbility.Execute();
             }
         });
     }

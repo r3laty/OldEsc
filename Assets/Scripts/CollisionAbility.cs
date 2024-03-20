@@ -1,14 +1,41 @@
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
-public class CollisionAbility : MonoBehaviour, IAbility, IConvertGameObjectToEntity
+public class CollisionAbility : MonoBehaviour, IConvertGameObjectToEntity, IAbility
 {
     public Collider Collider;
 
-    public void Execute(float colliders)
+    public List<MonoBehaviour> CollisionActions = new List<MonoBehaviour>();
+    public List<IAbillityTarget> CollidersActionAbillities = new List<IAbillityTarget>();
+
+    [HideInInspector] public List<Collider> Collisions;
+    private void Start()
     {
-        Debug.Log("Hit");
+        foreach (var item in CollisionActions)
+        {
+            if (item is IAbillityTarget ability)
+            {
+                CollidersActionAbillities.Add(ability);
+            }
+            else
+            {
+                Debug.LogError($"ACTION + {item.name} IS NOT ABILITY");
+            }
+        }
+    }
+    public void Execute()
+    {
+        foreach (var item in CollidersActionAbillities)
+        {
+            Collisions.ForEach(collider =>
+            {
+                if (collider != null) item.Targets.Add(collider.gameObject);
+            });
+            item.Execute();
+        }
     }
     public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
@@ -51,7 +78,7 @@ public class CollisionAbility : MonoBehaviour, IAbility, IConvertGameObjectToEnt
                 });
                 break;
         }
-                Collider.enabled = false;
+        Collider.enabled = false;
     }
 }
 

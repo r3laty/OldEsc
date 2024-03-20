@@ -4,9 +4,10 @@ public class ShootAbility : MonoBehaviour, IAbility
 {
     [SerializeField] private GameObject bullet;
     [SerializeField] private float shootDelay;
+    [SerializeField] private float shootingForce = 10;
 
     private float _shootTime = float.MinValue;
-    public void Execute(float shootingForce)
+    public void Execute()
     {
         if (Time.time < _shootTime + shootDelay)
         {
