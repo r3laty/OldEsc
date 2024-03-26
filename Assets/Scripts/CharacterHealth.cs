@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using TMPro;
 using UnityEngine;
 
@@ -28,8 +29,6 @@ public class CharacterHealth : MonoBehaviour
 
     private void WriteStats()
     {
-        var jsonString = JsonUtility.ToJson(shootAbility.stats);
-        Debug.Log(jsonString);
-        PlayerPrefs.SetString("ShootCount", jsonString);
+        File.WriteAllText(Application.streamingAssetsPath + "/JsonFile.json", JsonUtility.ToJson(shootAbility.stats));
     }
 }

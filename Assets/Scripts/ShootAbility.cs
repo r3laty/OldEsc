@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using TMPro;
 using UnityEngine;
 
@@ -16,16 +17,12 @@ public class ShootAbility : MonoBehaviour, IAbility
     private float _shootTime = float.MinValue;
     private void Start()
     {
-        var jsonString = PlayerPrefs.GetString("ShootCount");
-        if (!jsonString.Equals(string.Empty, StringComparison.Ordinal))
-        {
-            stats = JsonUtility.FromJson<PlayerStats>(jsonString);
-        }
+        stats = JsonUtility.FromJson<PlayerStats>(File.ReadAllText(Application.streamingAssetsPath + "/JsonFile.json"));
 
-        var jsonStr = jsonString.Substring(14);
-        var convertedJsonString = jsonStr.TrimEnd('}');
+        var jsonStr = stats.ShootCount.ToString(); //.Substring(14);
+        //var convertedJsonString = jsonStr.TrimEnd('}');
 
-        shootCount.text = _textPatter + convertedJsonString;
+        shootCount.text = _textPatter + jsonStr;
     }
     public void Execute()
     {
