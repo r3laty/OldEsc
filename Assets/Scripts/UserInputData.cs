@@ -5,18 +5,24 @@ using UnityEngine;
 public class UserInputData : MonoBehaviour, IConvertGameObjectToEntity
 {
     public MonoBehaviour ShootAbility;
-    [SerializeField] private float moveSpeed = 1;
-    [SerializeField] private float dashSpeed = 1.5f;
-    [SerializeField] private float shootForce = 3;
+    [SerializeField] private PlayerSettings playerSettings;
+
+    private float _moveSpeed;
+    private float _dashSpeed;
+    private float _shootForce;
     public void Convert(Entity entity, EntityManager dstManager, GameObjectConversionSystem conversionSystem)
     {
+        _moveSpeed = playerSettings.MoveSpeed;
+        _dashSpeed = playerSettings.DashingForce;
+        _shootForce = playerSettings.ShootingForce;
+
         dstManager.AddComponentData(entity, new InputData());
-        dstManager.AddComponentData(entity, new MoveData() { Speed = this.moveSpeed });
-        dstManager.AddComponentData(entity, new Dash() { DashForce = this.dashSpeed });
+        dstManager.AddComponentData(entity, new MoveData() { Speed = this._moveSpeed });
+        dstManager.AddComponentData(entity, new Dash() { DashForce = this._dashSpeed });
 
         if (ShootAbility != null && ShootAbility is IAbility)
         {
-            dstManager.AddComponentData(entity, new ShootData() { Force = this.shootForce});
+            dstManager.AddComponentData(entity, new ShootData() { Force = this._shootForce });
         }
     }
 }
